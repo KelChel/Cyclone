@@ -4,11 +4,28 @@ using UnityEngine;
 
 public class DamageScript : MonoBehaviour
 {
-    public int damageCount = 10;
+    public int damageAmount = 10;
+    Collider damageCollider;
 
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        PlayerManager.Damage(damageCount);
+    private void Start() {
+        damageCollider = GetComponent<CapsuleCollider>();
     }
+
+    private void OnTriggerEnter(Collider hitTarget)
+    {
+        if (!hitTarget.transform.TryGetComponent<IDamagable>(out IDamagable target))
+          return;
+        target.TakeDamage(damageAmount);
+    }
+
+    public void EnableDamageCollider()
+    {
+        damageCollider.enabled = true;
+    }
+    public void DisableDamageCollider()
+    {
+        damageCollider.enabled = false;
+    }
+
 }
