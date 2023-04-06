@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour , IDamagable
+public class EnemyManager : MonoBehaviour , IDamagable
 {
-    public DamageScript damageScript;
+    private DamageScript damageScript;
     [HideInInspector]public Animator animator;
-    NavMeshAgent navMeshAgent;
-
+    private NavMeshAgent navMeshAgent;
+    
+    public int enemyDamage = 10;
     public int healthEnemy = 50;
 
     private void Awake() 
     {
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
-
+        damageScript = GetComponentInChildren<DamageScript>();
+    }
+    private void Start() 
+    {
+        damageScript.damageAmount = enemyDamage;
     }
 
     public void OpenDamageCollider()
@@ -46,6 +51,8 @@ public class Enemy : MonoBehaviour , IDamagable
     public void EnemyDied()
     {
         healthEnemy = 0;
+        GetComponent<Collider>().enabled = false;
+        CloseDamageCollider();
         animator.SetBool("isDead",true);
         animator.SetBool("isPatrolling", false);
         animator.SetBool("isChasing", false);

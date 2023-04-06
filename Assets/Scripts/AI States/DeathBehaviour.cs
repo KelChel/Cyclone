@@ -7,8 +7,6 @@ public class DeathBehaviour : StateMachineBehaviour
 {
     NavMeshAgent agent; 
 
-
-
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         agent = animator.GetComponent<NavMeshAgent>();
@@ -16,7 +14,6 @@ public class DeathBehaviour : StateMachineBehaviour
  
         animator.SetBool("isDead",false);
         agent.SetDestination(agent.transform.position);
-        agent.transform.GetComponent<Collider>().enabled = false;
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

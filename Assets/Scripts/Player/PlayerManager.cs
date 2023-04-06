@@ -6,17 +6,27 @@ using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour, IDamagable
 {
+    [SerializeField]private int initPlayerHealth = 100;
+    private int playerHealth;
+    public int heroDamage = 10;
 
-    public static int playerHealth;
     public static bool gameOver;
     public TextMeshProUGUI playerHealthText;
 
-    public DamageScript damageScript;
+
+    private DamageScript damageScript;
+
+    private void Awake() 
+    {
+        damageScript = GetComponentInChildren<DamageScript>();
+    }
 
     void Start()
     {
-        playerHealth = 100;
+        playerHealth = initPlayerHealth;
         gameOver = false;
+        damageScript.damageAmount = heroDamage;
+        playerHealthText.text = "" + playerHealth;
     }
 
     void Update()

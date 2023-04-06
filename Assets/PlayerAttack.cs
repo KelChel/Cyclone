@@ -4,53 +4,32 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public Animator animator;
+    private Animator animator;
 
-    //
-public float cooldownTime = 0.8f;
-private float nextFireTime = 0f;
-public static int noOfClicks = 0;
-float lastClickedTime = 0;
-float maxComboDelay = 1;
-    //
-
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         animator = GetComponent<Animator>();
     }
-
-    // Update is called once per frame
+ 
     void Update()
     {
         if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f && !animator.GetCurrentAnimatorStateInfo(0).IsName("isAttack"))
         {
             animator.SetBool("isAttack", false);
-            noOfClicks = 0;
         }
-
-        if(Time.time - lastClickedTime > maxComboDelay)
-        {
-            noOfClicks = 0;
-        }
-        //if(Time.time > nextFireTime)
-        //{
-        //    if(Input.GetMouseButtonDown(0))
-        //    {
-        //        defaultAttack();
-        //    }
-        //}
+        // if(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f && !animator.GetCurrentAnimatorStateInfo(0).IsName("isDanceAttack"))
+        // {
+        //     animator.SetBool("isDanceAttack", false);
+        // }
     }
 
-    public void defaultAttack()
+    public void DefaultAttack()
+    { 
+        animator.SetBool("isAttack", true);
+    }
+
+    public void SpinAttack()
     {
-        Debug.Log(animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
-        Debug.Log(animator.GetCurrentAnimatorStateInfo(0).IsName("isAttack"));
-        lastClickedTime = Time.time;
-        noOfClicks++;
-        if(noOfClicks == 1)
-        {
-            animator.SetBool("isAttack", true);
-        }
+        animator.SetBool("isDanceAttack", true);
     }
 }
