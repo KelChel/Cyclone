@@ -11,6 +11,7 @@ public class EnemyManager : MonoBehaviour , IDamagable
     
     public int enemyDamage = 10;
     public int healthEnemy = 50;
+    [HideInInspector]public int maxHealth;
 
     private void Awake() 
     {
@@ -20,6 +21,7 @@ public class EnemyManager : MonoBehaviour , IDamagable
     }
     private void Start() 
     {
+        maxHealth = healthEnemy;
         damageScript.damageAmount = enemyDamage;
     }
 

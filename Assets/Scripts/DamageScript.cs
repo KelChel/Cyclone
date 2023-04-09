@@ -7,7 +7,6 @@ public class DamageScript : MonoBehaviour
     [HideInInspector]public int damageAmount = 10;
     Collider damageCollider;
 
-
     private void Start() 
     {
         damageCollider = GetComponent<Collider>();
@@ -15,9 +14,8 @@ public class DamageScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider hitTarget)
     {
-        
         if (!hitTarget.transform.TryGetComponent<IDamagable>(out IDamagable target))
-          return;
+            return;
         target.TakeDamage(damageAmount);
     }
 
