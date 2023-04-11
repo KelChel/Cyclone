@@ -41,6 +41,4 @@ public class ChaseBehaviour : StateMachineBehaviour
         agent.SetDestination(agent.transform.position);
         agent.speed = 2;
     }
-
-
 }

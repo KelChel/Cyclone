@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyManager : MonoBehaviour , IDamagable
+public class EnemyManager : MonoBehaviour, IDamagable
 {
     private DamageScript damageScript;
-    [HideInInspector]public Animator animator;
+    [HideInInspector] public Animator animator;
     private NavMeshAgent navMeshAgent;
-    
+
     public int enemyDamage = 10;
     public int healthEnemy = 50;
-    [HideInInspector]public int maxHealth;
+    [HideInInspector] public int maxHealth;
 
-    private void Awake() 
+    private void Awake()
     {
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         damageScript = GetComponentInChildren<DamageScript>();
     }
-    private void Start() 
+    private void Start()
     {
         maxHealth = healthEnemy;
         damageScript.damageAmount = enemyDamage;
@@ -36,15 +36,8 @@ public class EnemyManager : MonoBehaviour , IDamagable
 
     public void TakeDamage(int damageAmount)
     {
-        if(healthEnemy > 0)
-        {
-            healthEnemy -= damageAmount;
-            if(healthEnemy <= 0)
-            {
-                EnemyDied();
-            }
-        } 
-        else
+        healthEnemy -= damageAmount;
+        if (healthEnemy <= 0)
         {
             EnemyDied();
         }
@@ -53,11 +46,11 @@ public class EnemyManager : MonoBehaviour , IDamagable
     public void EnemyDied()
     {
         healthEnemy = 0;
-        GetComponent<Collider>().enabled = false;
-        CloseDamageCollider();
-        animator.SetBool("isDead",true);
+
         animator.SetBool("isPatrolling", false);
         animator.SetBool("isChasing", false);
         animator.SetBool("isAttacking", false);
+        animator.SetBool("isDead", true);
+        GetComponent<Collider>().enabled = false;
     }
 }

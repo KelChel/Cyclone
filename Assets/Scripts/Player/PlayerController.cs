@@ -43,16 +43,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (joystickLook.x == 0 && joystickLook.y == 0)
-        {
-            animator.SetBool("isDanceAttack", false);
-        }
-        else
-        {
-            animator.SetBool("isAttack", false);
-            animator.SetBool("isDanceAttack", true);
-        }
-        movePlayer();
+        
+        
 
 
         if (move == Vector2.zero)
@@ -67,6 +59,19 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetFloat("MoveSpeed", 0.5f);
         }
+    }
+    void FixedUpdate()
+    {
+        if (joystickLook.x == 0 && joystickLook.y == 0)
+        {
+            animator.SetBool("isDanceAttack", false);
+        }
+        else
+        {
+            animator.SetBool("isAttack", false);
+            animator.SetBool("isDanceAttack", true);
+        }
+        movePlayer();
     }
 
     public void playerAttack()
@@ -86,10 +91,12 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetFloat("MoveSpeed", 0);
         }
-        if (movement != Vector3.zero)
+        if (movement != Vector3.zero && (joystickLook.x == 0 && joystickLook.y == 0))
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
         }
+        
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
+        
     }
 }
