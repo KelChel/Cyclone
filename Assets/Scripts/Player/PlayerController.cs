@@ -117,6 +117,7 @@ public class PlayerController : MonoBehaviour
     public void movePlayer()
     {
         Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
+        // Vector3 movement = new Vector3(1f, 0f, 1f);
         if (movement == Vector3.zero)
         {
             animator.SetFloat("MoveSpeed", 0);
@@ -132,7 +133,7 @@ public class PlayerController : MonoBehaviour
     public void movePlayerWithAim()
     {
         
-            Vector3 aimDirection = new Vector3(joystickLook.x, 0f, joystickLook.y);
+        Vector3 aimDirection = new Vector3(joystickLook.x, 0f, joystickLook.y);
 
             if (aimDirection != Vector3.zero)
             {
@@ -141,7 +142,7 @@ public class PlayerController : MonoBehaviour
         
 
         Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
-
+        // Vector3 movement = new Vector3(1f, 0f, 1f);
         // transform.Translate(movement * speed * Time.deltaTime);
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
 
@@ -152,25 +153,18 @@ public class PlayerController : MonoBehaviour
         _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y)*Mathf.Rad2Deg;
         _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg;
 
-        if(_joyStickLookAngle <= 0f)
-        {
-            _joyStickLookAngle += 360f;
-        }
-        if(_joyStickMoveAngle <= 0f)
-        {
-            _joyStickMoveAngle += 360f;
-        }
+        
+        _joyStickLookAngle = CheckAngle(_joyStickLookAngle);
+        _joyStickMoveAngle = CheckAngle(_joyStickMoveAngle);
         if(!(joystickLook.x == 0) || !(joystickLook.y == 0))
         {
             _lastJoystickLookAngle = _joyStickLookAngle;
         }
         
         _joySticksAngle = _lastJoystickLookAngle - _joyStickMoveAngle;
+
+        _joySticksAngle = CheckAngle(_joySticksAngle);
         
-        if(_joySticksAngle < 0f)
-        {
-            _joySticksAngle += 360f;
-        }
 
         if(joystickMove.x == 0 && joystickMove.y == 0)
         {
@@ -208,5 +202,13 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetInteger("StickMoveAngle", 5);
         }
+    }
+    private float CheckAngle(float JoyStickAngle)
+    {
+        if(JoyStickAngle <= 0f)
+        {
+            JoyStickAngle += 360f;
+        }
+        return JoyStickAngle;
     }
 }
