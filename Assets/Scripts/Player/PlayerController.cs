@@ -8,22 +8,27 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
+    public float TargetSmoothAnimation = 2;
     private Vector2 joystickMove;
     private Vector2 mouseLook;
     private Vector2 joystickLook;
     private Vector3 rotationTarget;
-    public Animator animator;
+    [HideInInspector]private Animator animator;
 
 
     Vector3 aimDirection;
+    Vector3 movement;
 
     float _joyStickMoveAngle;
     float _joyStickLookAngle;
     float _joySticksAngle;
     float _lastJoystickLookAngle;
 
+    float _finalAngle = 0;
+
     public void OnMove(InputAction.CallbackContext context)
     {
+        
         joystickMove = context.ReadValue<Vector2>();
     }
 
@@ -54,26 +59,24 @@ public class PlayerController : MonoBehaviour
         _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y)*Mathf.Rad2Deg;
         _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg;
         _joySticksAngle = _joyStickLookAngle - _joyStickMoveAngle;
-        _lastJoystickLookAngle=_joyStickLookAngle;
+        _lastJoystickLookAngle = _joyStickLookAngle;
     }
 
 
     void Update()
     {
-
         // Debug.Log("X = " + joystickLook.x);
         // Debug.Log("Y = " + joystickLook.y);
         // Debug.Log(Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg);
 
-        // if (joystickLook.x == 0 && joystickLook.y == 0)
-        // {
-        //     animator.SetBool("isCyclone", false);
-        // }
-        // else
-        // {
-        //     animator.SetBool("isAttack", false);
-        //     animator.SetBool("isCyclone", true);
-        // }
+        if((joystickLook.x == 0) || (joystickLook.y == 0))
+        {
+            animator.SetBool("isAttack", false);
+        }
+        else
+        {
+            animator.SetBool("isAttack", true);
+        }
 
 
         if (joystickMove == Vector2.zero)
@@ -89,7 +92,7 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetFloat("MoveSpeed", 0.5f);
         }
-        StickMoveAnimation();
+        
 
     }
 
@@ -111,12 +114,14 @@ public class PlayerController : MonoBehaviour
             // animator.SetBool("isCyclone", true);
             movePlayerWithAim();
         }
+        StickMoveAnimation();
     }
 
 
     public void movePlayer()
     {
-        Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
+        movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
+        
         // Vector3 movement = new Vector3(1f, 0f, 1f);
         if (movement == Vector3.zero)
         {
@@ -125,6 +130,7 @@ public class PlayerController : MonoBehaviour
         // if (movement != Vector3.zero && (joystickLook.x == 0 && joystickLook.y == 0))
         // {
         //     transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
+        //     _lastJoystickLookAngle = _joyStickMoveAngle;
         // }
         
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
@@ -133,16 +139,16 @@ public class PlayerController : MonoBehaviour
     public void movePlayerWithAim()
     {
         
-        Vector3 aimDirection = new Vector3(joystickLook.x, 0f, joystickLook.y);
+        aimDirection = new Vector3(joystickLook.x, 0f, joystickLook.y);
 
-            if (aimDirection != Vector3.zero)
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(aimDirection), 0.15f);
-            }
+        if (aimDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(aimDirection), 0.15f);
+        }
         
 
-        Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
-        // Vector3 movement = new Vector3(1f, 0f, 1f);
+        // Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
+        movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
         // transform.Translate(movement * speed * Time.deltaTime);
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
 
@@ -156,6 +162,7 @@ public class PlayerController : MonoBehaviour
         
         _joyStickLookAngle = CheckAngle(_joyStickLookAngle);
         _joyStickMoveAngle = CheckAngle(_joyStickMoveAngle);
+
         if(!(joystickLook.x == 0) || !(joystickLook.y == 0))
         {
             _lastJoystickLookAngle = _joyStickLookAngle;
@@ -165,43 +172,53 @@ public class PlayerController : MonoBehaviour
 
         _joySticksAngle = CheckAngle(_joySticksAngle);
         
-
+        
+        // _finalAngle = Mathf.Lerp(_finalAngle, _joySticksAngle, Time.deltaTime * TargetSmoothAnimation);
+        // Debug.Log(_finalAngle);
         if(joystickMove.x == 0 && joystickMove.y == 0)
         {
-            animator.SetInteger("StickMoveAngle", 0);
+            // _finalAngle = Mathf.Lerp(_finalAngle, _lastJoystickLookAngle, Time.deltaTime * TargetSmoothAnimation);
+            animator.SetFloat("StickMoveAngle", 0);
         }
-        else if(_joySticksAngle <=22.5 || _joySticksAngle > 337.5)
+        else
         {
-            animator.SetInteger("StickMoveAngle", 1);
+            // _finalAngle = Mathf.Lerp(_finalAngle, _lastJoystickLookAngle, Time.deltaTime * TargetSmoothAnimation);
+            animator.SetFloat("StickMoveAngle", _joySticksAngle);
         }
-        else if(_joySticksAngle <=67.5 && _joySticksAngle > 22.5)
-        {
-            animator.SetInteger("StickMoveAngle", 2);
-        }
-        else if(_joySticksAngle <=112.5 && _joySticksAngle > 67.5)
-        {
-            animator.SetInteger("StickMoveAngle", 3);
-        }
-        else if(_joySticksAngle <=157.5 && _joySticksAngle > 112.5)
-        {
-            animator.SetInteger("StickMoveAngle", 4);
-        }
-        else if(_joySticksAngle <=360-22.5 && _joySticksAngle > 360-67.5)
-        {
-            animator.SetInteger("StickMoveAngle", -2);
-        }
-        else if(_joySticksAngle <=360-67.5 && _joySticksAngle > 360-112.5)
-        {
-            animator.SetInteger("StickMoveAngle", -3);
-        }
-        else if(_joySticksAngle <=360-112.5 && _joySticksAngle > 360-157.5)
-        {
-            animator.SetInteger("StickMoveAngle", -4);
-        }
-        else if(_joySticksAngle > 157.5 && _joySticksAngle <= 360-157.5)
-        {
-            animator.SetInteger("StickMoveAngle", 5);
-        }
+        // animator.SetFloat("StickMoveAngle", _finalAngle);
+
+        // else if(_joySticksAngle <=22.5 || _joySticksAngle > 337.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", 1);
+        // }
+        // else if(_joySticksAngle <=67.5 && _joySticksAngle > 22.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", 2);
+        // }
+        // else if(_joySticksAngle <=112.5 && _joySticksAngle > 67.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", 3);
+        // }
+        // else if(_joySticksAngle <=157.5 && _joySticksAngle > 112.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", 4);
+        // }
+        // else if(_joySticksAngle <=360-22.5 && _joySticksAngle > 360-67.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", -2);
+        // }
+        // else if(_joySticksAngle <=360-67.5 && _joySticksAngle > 360-112.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", -3);
+        // }
+        // else if(_joySticksAngle <=360-112.5 && _joySticksAngle > 360-157.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", -4);
+        // }
+        // else if(_joySticksAngle > 157.5 && _joySticksAngle <= 360-157.5)
+        // {
+        //     animator.SetInteger("StickMoveAngle", 5);
+        // }
     }
     private float CheckAngle(float JoyStickAngle)
     {

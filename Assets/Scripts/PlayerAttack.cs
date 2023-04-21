@@ -13,14 +13,14 @@ public class PlayerAttack : MonoBehaviour
  
     void Update()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f && !animator.GetCurrentAnimatorStateInfo(0).IsName("isAttack"))
-        {
-            animator.SetBool("isAttack", false);
-        }
-        if(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f && !animator.GetCurrentAnimatorStateInfo(0).IsName("isDanceAttack"))
-        {
-            animator.SetBool("isCyclone", false);
-        }
+        // if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.3f && !animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+        // {
+        //     animator.SetBool("isAttack", false);
+        // }
+        // if(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f && !animator.GetCurrentAnimatorStateInfo(0).IsName("isDanceAttack"))
+        // {
+        //     animator.SetBool("isCyclone", false);
+        // }
     }
 
     public void DefaultAttack()
