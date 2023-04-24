@@ -9,11 +9,13 @@ public class PlayerController : MonoBehaviour
 {
     public float speed;
     public float TargetSmoothAnimation = 2;
+
+    public GameObject SlashParticle;
     private Vector2 joystickMove;
     private Vector2 mouseLook;
     private Vector2 joystickLook;
     private Vector3 rotationTarget;
-    [HideInInspector]private Animator animator;
+    [HideInInspector] private Animator animator;
 
 
     Vector3 aimDirection;
@@ -28,7 +30,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        
         joystickMove = context.ReadValue<Vector2>();
     }
 
@@ -51,25 +52,31 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
-        
     }
 
-    private void Start() {
+    private void Start()
+    {
+        SlashParticle.SetActive(false);
+
+
         aimDirection = new Vector3(0f, 0f, 1f);
-        _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y)*Mathf.Rad2Deg;
-        _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg;
+
+        _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y) * Mathf.Rad2Deg;
+        _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y) * Mathf.Rad2Deg;
+
         _joySticksAngle = _joyStickLookAngle - _joyStickMoveAngle;
         _lastJoystickLookAngle = _joyStickLookAngle;
+
     }
 
 
     void Update()
     {
-        // Debug.Log("X = " + joystickLook.x);
-        // Debug.Log("Y = " + joystickLook.y);
-        // Debug.Log(Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg);
-
-        if((joystickLook.x == 0) || (joystickLook.y == 0))
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+        {
+            animator.SetBool("isAttack", false);
+        }
+        if ((joystickLook.x == 0) || (joystickLook.y == 0))
         {
             animator.SetBool("isAttack", false);
         }
@@ -79,10 +86,10 @@ public class PlayerController : MonoBehaviour
         }
 
 
+
         if (joystickMove == Vector2.zero)
         {
             animator.SetFloat("MoveSpeed", 0f);
-            
         }
         else if (Math.Abs(joystickMove.x) > 0.7 || Math.Abs(joystickMove.y) > 0.7)
         {
@@ -92,97 +99,85 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetFloat("MoveSpeed", 0.5f);
         }
-        
 
+        StickMoveAnimation();
     }
-
-     
-
-
 
     void FixedUpdate()
     {
-        
         if (joystickLook.x == 0 && joystickLook.y == 0)
         {
-            // animator.SetBool("isCyclone", false);
             movePlayer();
         }
         else
         {
-            // animator.SetBool("isAttack", false);
-            // animator.SetBool("isCyclone", true);
             movePlayerWithAim();
         }
-        StickMoveAnimation();
     }
 
 
     public void movePlayer()
     {
         movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
-        
-        // Vector3 movement = new Vector3(1f, 0f, 1f);
+
         if (movement == Vector3.zero)
         {
             animator.SetFloat("MoveSpeed", 0);
         }
-        // if (movement != Vector3.zero && (joystickLook.x == 0 && joystickLook.y == 0))
-        // {
-        //     transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
-        //     _lastJoystickLookAngle = _joyStickMoveAngle;
-        // }
-        
+        if (movement != Vector3.zero && (joystickLook.x == 0 && joystickLook.y == 0))
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), 0.15f);
+        }
+
+        _lastJoystickLookAngle = Mathf.Atan2(joystickMove.x, joystickMove.y) * Mathf.Rad2Deg;
+
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
-        
+
     }
+
     public void movePlayerWithAim()
     {
-        
         aimDirection = new Vector3(joystickLook.x, 0f, joystickLook.y);
 
         if (aimDirection != Vector3.zero)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(aimDirection), 0.15f);
         }
-        
 
-        // Vector3 movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
         movement = new Vector3(joystickMove.x, 0f, joystickMove.y);
-        // transform.Translate(movement * speed * Time.deltaTime);
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
-
     }
 
     public void StickMoveAnimation()
     {
-        _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y)*Mathf.Rad2Deg;
-        _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y)*Mathf.Rad2Deg;
+        _joyStickMoveAngle = Mathf.Atan2(joystickMove.x, joystickMove.y) * Mathf.Rad2Deg;
+        _joyStickLookAngle = Mathf.Atan2(joystickLook.x, joystickLook.y) * Mathf.Rad2Deg;
 
-        
+
         _joyStickLookAngle = CheckAngle(_joyStickLookAngle);
         _joyStickMoveAngle = CheckAngle(_joyStickMoveAngle);
 
-        if(!(joystickLook.x == 0) || !(joystickLook.y == 0))
+        if (!(joystickLook.x == 0) || !(joystickLook.y == 0))
         {
             _lastJoystickLookAngle = _joyStickLookAngle;
         }
-        
+
         _joySticksAngle = _lastJoystickLookAngle - _joyStickMoveAngle;
 
         _joySticksAngle = CheckAngle(_joySticksAngle);
-        
-        
-        // _finalAngle = Mathf.Lerp(_finalAngle, _joySticksAngle, Time.deltaTime * TargetSmoothAnimation);
-        // Debug.Log(_finalAngle);
-        if(joystickMove.x == 0 && joystickMove.y == 0)
+
+        Debug.Log(_joySticksAngle);
+        if (_finalAngle > 350f || _finalAngle < 10f)
         {
-            // _finalAngle = Mathf.Lerp(_finalAngle, _lastJoystickLookAngle, Time.deltaTime * TargetSmoothAnimation);
-            animator.SetFloat("StickMoveAngle", 0);
+            // _finalAngle = Mathf.Lerp(_finalAngle, _joySticksAngle, Time.deltaTime * TargetSmoothAnimation);
+            _finalAngle = _joySticksAngle;
+
+            animator.SetFloat("StickMoveAngle", _joySticksAngle);
         }
         else
         {
-            // _finalAngle = Mathf.Lerp(_finalAngle, _lastJoystickLookAngle, Time.deltaTime * TargetSmoothAnimation);
+            _finalAngle = Mathf.Lerp(_finalAngle, _joySticksAngle, Time.deltaTime * TargetSmoothAnimation);
+
             animator.SetFloat("StickMoveAngle", _joySticksAngle);
         }
         // animator.SetFloat("StickMoveAngle", _finalAngle);
@@ -222,10 +217,19 @@ public class PlayerController : MonoBehaviour
     }
     private float CheckAngle(float JoyStickAngle)
     {
-        if(JoyStickAngle <= 0f)
+        if (JoyStickAngle <= 0f)
         {
             JoyStickAngle += 360f;
         }
         return JoyStickAngle;
+    }
+
+    public void EnableSlashParticle()
+    {
+        SlashParticle.SetActive(true);
+    }
+    public void DisableSlashParticle()
+    {
+        SlashParticle.SetActive(false);
     }
 }

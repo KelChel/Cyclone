@@ -9,7 +9,7 @@ public class DamageScript : MonoBehaviour
 
     private void Start() 
     {
-        damageCollider = GetComponent<Collider>();
+        damageCollider = transform.GetComponent<Collider>();
     }
 
     private void OnTriggerEnter(Collider hitTarget)

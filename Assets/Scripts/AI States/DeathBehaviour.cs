@@ -12,7 +12,7 @@ public class DeathBehaviour : StateMachineBehaviour
         agent = animator.GetComponent<NavMeshAgent>();
         agent.speed = 0f;
         agent.SetDestination(agent.transform.position); 
-        agent.enabled = false;
+        
         animator.SetBool("isDead",false);
     }
 
