@@ -11,11 +11,19 @@ public class PlayerController : MonoBehaviour
     public float TargetSmoothAnimation = 2;
 
     public GameObject SlashParticle;
+    public GameObject CycloneParticle;
     private Vector2 joystickMove;
     private Vector2 mouseLook;
     private Vector2 joystickLook;
     private Vector3 rotationTarget;
     [HideInInspector] private Animator animator;
+
+
+    public float coldownTime = 2f;
+    private float nextFireTime = 0f;
+    public static int noOfClicks =  0;
+    float lastClickedTime = 0;
+    float maxComboDelay = 1;
 
 
     Vector3 aimDirection;
@@ -48,6 +56,21 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isAttack", true);
     }
 
+    public void OnCyclone(InputAction.CallbackContext context)
+    {
+        animator.SetBool("isCyclone", true);
+        CycloneParticle.SetActive(true);
+        StartCoroutine(ExampleCoroutine());
+
+    }
+
+    IEnumerator ExampleCoroutine()
+    {
+        yield return new WaitForSeconds(5);
+        animator.SetBool("isCyclone", false);
+        CycloneParticle.SetActive(false);
+    }
+
 
     void Awake()
     {
@@ -57,7 +80,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         SlashParticle.SetActive(false);
-
+        CycloneParticle.SetActive(false);
 
         aimDirection = new Vector3(0f, 0f, 1f);
 

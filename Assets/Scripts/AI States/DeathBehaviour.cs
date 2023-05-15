@@ -12,8 +12,11 @@ public class DeathBehaviour : StateMachineBehaviour
         agent = animator.GetComponent<NavMeshAgent>();
         agent.speed = 0f;
         agent.SetDestination(agent.transform.position); 
-        
+        agent.GetComponent<EnemyManager>().CloseDamageCollider();
         animator.SetBool("isDead",false);
+        // agent.GetComponent<Animator>().enabled = false;
+        // agent.enabled = false;
+    
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
