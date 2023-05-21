@@ -4,26 +4,29 @@ using System.Collections.Generic;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed;
     public float TargetSmoothAnimation = 2;
+    public float CycloneDuration = 5f;
+    public float CycloneDelay = 5f;
+    private float tempCycloneDelay = 0f;
+
+
+    private string nextLevelName;
+
 
     public GameObject SlashParticle;
     public GameObject CycloneParticle;
+    public GameObject CycloneTextButton;
+    public GameObject UseButton;
     private Vector2 joystickMove;
     private Vector2 mouseLook;
     private Vector2 joystickLook;
-    private Vector3 rotationTarget;
     [HideInInspector] private Animator animator;
-
-
-    public float coldownTime = 2f;
-    private float nextFireTime = 0f;
-    public static int noOfClicks =  0;
-    float lastClickedTime = 0;
-    float maxComboDelay = 1;
 
 
     Vector3 aimDirection;
@@ -53,23 +56,46 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        animator.SetBool("isAttack", true);
+        if (animator.GetBool("isCyclone") == false)
+        {
+            animator.SetBool("isAttack", true);
+        }
     }
 
     public void OnCyclone(InputAction.CallbackContext context)
     {
-        animator.SetBool("isCyclone", true);
-        CycloneParticle.SetActive(true);
-        StartCoroutine(ExampleCoroutine());
+        if (Time.time - tempCycloneDelay >= CycloneDelay)
+        {
+            tempCycloneDelay = Time.time;
+            animator.SetBool("isCyclone", true);
+            CycloneParticle.SetActive(true);
+            animator.SetLayerWeight(2, 1);
+            StartCoroutine(CycloneCoroutine());
+        }
+    }
+
+    public void OnUsePortal(InputAction.CallbackContext context)
+    {
+        OnTeleportToLocation();
+    }
+
+    public void OnDash(InputAction.CallbackContext context)
+    {
 
     }
 
-    IEnumerator ExampleCoroutine()
+    IEnumerator CycloneCoroutine()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(CycloneDuration);
         animator.SetBool("isCyclone", false);
         CycloneParticle.SetActive(false);
+        animator.SetLayerWeight(2, 0);
+        transform.GetComponent<PlayerManager>().CloseDamageCollider();
+
     }
+
+
+    
 
 
     void Awake()
@@ -90,22 +116,35 @@ public class PlayerController : MonoBehaviour
         _joySticksAngle = _joyStickLookAngle - _joyStickMoveAngle;
         _lastJoystickLookAngle = _joyStickLookAngle;
 
+        tempCycloneDelay -= CycloneDelay;
     }
 
 
     void Update()
     {
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+        if (Time.time - tempCycloneDelay >= CycloneDelay)
         {
-            animator.SetBool("isAttack", false);
-        }
-        if ((joystickLook.x == 0) || (joystickLook.y == 0))
-        {
-            animator.SetBool("isAttack", false);
+            CycloneTextButton.GetComponent<TextMeshProUGUI>().text = "Cyclone";
         }
         else
         {
-            animator.SetBool("isAttack", true);
+            CycloneTextButton.GetComponent<TextMeshProUGUI>().text = Convert.ToString((CycloneDelay - Mathf.Round(Time.time - tempCycloneDelay)));
+        }
+
+        if (animator.GetBool("isCyclone") == false)
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+            {
+                animator.SetBool("isAttack", false);
+            }
+            if ((joystickLook.x == 0) || (joystickLook.y == 0))
+            {
+                animator.SetBool("isAttack", false);
+            }
+            else
+            {
+                animator.SetBool("isAttack", true);
+            }
         }
 
 
@@ -189,12 +228,10 @@ public class PlayerController : MonoBehaviour
 
         _joySticksAngle = CheckAngle(_joySticksAngle);
 
-        Debug.Log(_joySticksAngle);
-        if (_finalAngle > 350f || _finalAngle < 10f)
+        if (_finalAngle > 345f || _finalAngle < 25f)
         {
             // _finalAngle = Mathf.Lerp(_finalAngle, _joySticksAngle, Time.deltaTime * TargetSmoothAnimation);
             _finalAngle = _joySticksAngle;
-
             animator.SetFloat("StickMoveAngle", _joySticksAngle);
         }
         else
@@ -203,40 +240,6 @@ public class PlayerController : MonoBehaviour
 
             animator.SetFloat("StickMoveAngle", _joySticksAngle);
         }
-        // animator.SetFloat("StickMoveAngle", _finalAngle);
-
-        // else if(_joySticksAngle <=22.5 || _joySticksAngle > 337.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", 1);
-        // }
-        // else if(_joySticksAngle <=67.5 && _joySticksAngle > 22.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", 2);
-        // }
-        // else if(_joySticksAngle <=112.5 && _joySticksAngle > 67.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", 3);
-        // }
-        // else if(_joySticksAngle <=157.5 && _joySticksAngle > 112.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", 4);
-        // }
-        // else if(_joySticksAngle <=360-22.5 && _joySticksAngle > 360-67.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", -2);
-        // }
-        // else if(_joySticksAngle <=360-67.5 && _joySticksAngle > 360-112.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", -3);
-        // }
-        // else if(_joySticksAngle <=360-112.5 && _joySticksAngle > 360-157.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", -4);
-        // }
-        // else if(_joySticksAngle > 157.5 && _joySticksAngle <= 360-157.5)
-        // {
-        //     animator.SetInteger("StickMoveAngle", 5);
-        // }
     }
     private float CheckAngle(float JoyStickAngle)
     {
@@ -254,5 +257,32 @@ public class PlayerController : MonoBehaviour
     public void DisableSlashParticle()
     {
         SlashParticle.SetActive(false);
+    }
+
+    public void OnTeleportToLocation()
+    {
+        SceneManager.LoadScene(nextLevelName);
+    }
+    private void OnTriggerEnter(Collider other) 
+    {
+        try
+        {
+            nextLevelName =  other.GetComponent<TeleportScript>().toLevelName;
+        }
+        catch
+        {
+
+        }
+    }
+    private void OnTriggerExit(Collider other) 
+    {
+        try
+        {
+            nextLevelName = "";
+        }
+        catch
+        {
+
+        }
     }
 }

@@ -13,6 +13,8 @@ public class EnemyManager : MonoBehaviour, IDamagable
     public int healthEnemy = 50;
     [HideInInspector] public int maxHealth;
 
+    public bool isAlive = true;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -52,5 +54,6 @@ public class EnemyManager : MonoBehaviour, IDamagable
         animator.SetBool("isAttacking", false);
         animator.SetBool("isDead", true);
         GetComponent<Collider>().enabled = false;
+        isAlive = false;
     }
 }
