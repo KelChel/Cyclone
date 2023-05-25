@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class PlayerManager : MonoBehaviour, IDamagable
 {
     [SerializeField]private int initPlayerHealth = 100;
-    private int playerHealth;
+    int playerHealth;
     public int heroDamage = 10;
 
     public static bool gameOver;
@@ -58,5 +58,18 @@ public class PlayerManager : MonoBehaviour, IDamagable
 
         playerHealthText.text = "" + playerHealth;
 
+    }
+    public void AddHealth(int healthAmount)
+    {
+        playerHealth += healthAmount;
+        playerHealthText.text = "" + playerHealth;
+    }
+    public void AddDamage(int damage)
+    {
+        heroDamage += damage;
+    }
+    public void AddSpeed(float speedAmount)
+    {
+        transform.GetComponent<PlayerController>().speed += speedAmount;
     }
 }

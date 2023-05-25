@@ -15,6 +15,8 @@ public class EnemyManager : MonoBehaviour, IDamagable
 
     public bool isAlive = true;
 
+    public GameObject Buff;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -55,5 +57,10 @@ public class EnemyManager : MonoBehaviour, IDamagable
         animator.SetBool("isDead", true);
         GetComponent<Collider>().enabled = false;
         isAlive = false;
+    }
+
+    public void DropBuff()
+    {
+        Instantiate(Buff, transform);
     }
 }
